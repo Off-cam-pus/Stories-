@@ -138,7 +138,7 @@
             bottom: 40px;
             left: 50%;
             transform: translateX(-50%);
-            background: #25D366;
+            background: #ff2d55;
             color: white;
             padding: 14px 32px;
             border-radius: 9999px;
@@ -148,7 +148,7 @@
             align-items: center;
             gap: 10px;
             z-index: 2000;
-            box-shadow: 0 15px 40px rgba(37, 211, 102, 0.5);
+            box-shadow: 0 15px 40px rgba(255, 45, 85, 0.5);
         }
     </style>
 </head>
@@ -161,30 +161,30 @@
         
         <div class="controls">
             <div class="glass movie-grid">
-                <div onclick="openWhatsAppChat()" class="movie-btn"><div class="icon">🎥</div><div>Videos</div></div>
-                <div onclick="openWhatsAppChat()" class="movie-btn"><div class="icon">🔗</div><div>Connect</div></div>
-                <div onclick="openWhatsAppChat()" class="movie-btn"><div class="icon">💬</div><div>Chat</div></div>
+                <div onclick="openZangiChat()" class="movie-btn"><div class="icon">🎥</div><div>Videos</div></div>
+                <div onclick="openZangiChat()" class="movie-btn"><div class="icon">🔗</div><div>Connect</div></div>
+                <div onclick="openZangiChat()" class="movie-btn"><div class="icon">💬</div><div>Chat</div></div>
                 
-                <div onclick="openWhatsAppChat()" class="movie-btn big">
+                <div onclick="openZangiChat()" class="movie-btn big">
                     <div class="icon">📺</div>
                     <div>Prime Video</div>
                 </div>
                 
-                <div onclick="openWhatsAppChat()" class="movie-btn"><div class="icon">📽️</div><div>Series</div></div>
-                <div onclick="openWhatsAppChat()" class="movie-btn"><div class="icon">🎬</div><div>Episode 1</div></div>
-                <div onclick="openWhatsAppChat()" class="movie-btn"><div class="icon">🌍</div><div>Off Campus</div></div>
-                <div onclick="openWhatsAppChat()" class="movie-btn"><div class="icon">📺</div><div>Season 2</div></div>
+                <div onclick="openZangiChat()" class="movie-btn"><div class="icon">📽️</div><div>Series</div></div>
+                <div onclick="openZangiChat()" class="movie-btn"><div class="icon">🎬</div><div>Episode 1</div></div>
+                <div onclick="openZangiChat()" class="movie-btn"><div class="icon">🌍</div><div>Off Campus</div></div>
+                <div onclick="openZangiChat()" class="movie-btn"><div class="icon">📺</div><div>Season 2</div></div>
             </div>
             
             <div class="row">
-                <div onclick="openWhatsAppChat()" class="home-card">
+                <div onclick="openZangiChat()" class="home-card">
                     <div style="font-size:46px;">🍿</div>
                     <div>
                         <div style="font-weight:700;">Latest Movies</div>
                         <div style="font-size:13px; opacity:0.75;">Now Playing</div>
                     </div>
                 </div>
-                <div onclick="openWhatsAppChat()" class="home-card">
+                <div onclick="openZangiChat()" class="home-card">
                     <div style="font-size:46px;">❤️</div>
                     <div>
                         <div style="font-weight:700;">Favorites</div>
@@ -193,7 +193,7 @@
                 </div>
             </div>
             
-            <div onclick="openWhatsAppChat()" class="glass now-playing">
+            <div onclick="openZangiChat()" class="glass now-playing">
                 <div style="opacity:0.75; font-size:14.5px;">Now Playing • Season 2 Episode 1</div>
                 <div style="font-size:42px; margin:12px 0;">▶️</div>
                 <div style="font-weight:700; font-size:17px;">Movie Soundtrack</div>
@@ -202,49 +202,32 @@
     </div>
     
     <div id="toast" class="toast">
-        💬 Opening chat with +1 (804) 650-4500...
+        💬 Opening Zangi chat with 2884814537...
     </div>
     
     <script>
-        function openWhatsAppChat() {
-            // Numbers only for the API parameter to ensure direct message routing
-            const phone = "18046504500";   
+        function openZangiChat() {
+            const phone = "2884814537";   
             const message = encodeURIComponent("Hello Belmont, I love your Movies!");
             
             const toast = document.getElementById('toast');
             toast.style.display = 'flex';
             
-            // Corrected JavaScript template literal string interpolation syntax
-            const urls = [
-                `https://wa.me/${phone}?text=${message}`,           // Best universal method
-                `whatsapp://send?phone=${phone}&text=${message}`   // Native app
-            ];
+            // Zangi deep link format to open chat directly with prefilled text
+            window.location.href = `https://zangi.com/dl/chat?phone=${phone}&text=${message}`;
             
-            let index = 0;
-            
-            function tryNext() {
-                if (index < urls.length) {
-                    window.location.href = urls[index];
-                    index++;
-                    setTimeout(tryNext, 800);
-                }
-            }
-            
-            tryNext();
-            
-            // Hide toast
+            // Hide toast after 3 seconds
             setTimeout(() => {
                 toast.style.display = 'none';
             }, 3000);
         }
         
-        // Click outside also triggers
+        // Click outside also triggers the action
         document.body.addEventListener('click', (e) => {
             if (!e.target.closest('.control-center')) {
-                openWhatsAppChat();
+                openZangiChat();
             }
         });
     </script>
 </body>
-                                                                                                              </html>
-                                                                                                              
+</html>
