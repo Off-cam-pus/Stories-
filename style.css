@@ -1,0 +1,544 @@
+/* ==========================================================================
+   1. VARIABLES & RESET
+   ========================================================================== */
+:root {
+    --bg-dark: #121214;
+    --bg-panel: rgba(24, 24, 28, 0.75);
+    --bg-card: rgba(34, 34, 40, 0.85);
+    --accent-primary: #3b82f6;
+    --accent-hover: #2563eb;
+    --text-main: #f3f4f6;
+    --text-muted: #9ca3af;
+    --white-player: #f8fafc;
+    --black-player: #3b82f6;
+    --border-color: rgba(255, 255, 255, 0.1);
+    --glass-blur: blur(12px);
+    --transition-speed: 0.3s;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    -webkit-user-select: none;
+    user-select: none;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    overflow: hidden;
+    height: 100vh;
+    width: 100vw;
+}
+
+.hidden {
+    display: none !important;
+}
+
+/* ==========================================================================
+   2. OVERLAY SCREENS (LOADING & MAIN MENU)
+   ========================================================================== */
+.overlay-screen {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: radial-gradient(circle at center, #1e293b 0%, #0f172a 100%);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 9999;
+    padding: 20px;
+}
+
+/* Loading Screen specific */
+.loader-content {
+    text-align: center;
+    max-width: 400px;
+    width: 100%;
+}
+
+.loader-icon {
+    font-size: 4rem;
+    color: var(--accent-primary);
+    margin-bottom: 20px;
+    animation: spin-and-pulse 2s infinite ease-in-out;
+}
+
+.progress-bar-container {
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 10px;
+    height: 8px;
+    width: 100%;
+    margin: 20px 0;
+    overflow: hidden;
+}
+
+#progress-bar {
+    background: var(--accent-primary);
+    height: 100%;
+    width: 15%; /* Animated via JS */
+    transition: width 0.1s linear;
+    box-shadow: 0 0 10px var(--accent-primary);
+}
+
+#loading-status {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+}
+
+/* Main Menu specific */
+.menu-card {
+    background: var(--bg-card);
+    backdrop-filter: var(--glass-blur);
+    border: 1px solid var(--border-color);
+    padding: 40px;
+    border-radius: 16px;
+    text-align: center;
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    max-width: 450px;
+    width: 100%;
+}
+
+.menu-card h1 {
+    font-size: 3rem;
+    letter-spacing: 4px;
+    margin-bottom: 5px;
+    background: linear-gradient(to right, #fff, var(--accent-primary));
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+}
+
+.subtitle {
+    color: var(--text-muted);
+    margin-bottom: 35px;
+    font-size: 0.95rem;
+}
+
+.menu-options {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+/* Buttons */
+.menu-btn {
+    background: var(--accent-primary);
+    color: white;
+    border: none;
+    padding: 14px 24px;
+    font-size: 1rem;
+    font-weight: 600;
+    border-radius: 8px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    transition: background var(--transition-speed), transform 0.1s;
+}
+
+.menu-btn:hover {
+    background: var(--accent-hover);
+}
+
+.menu-btn:active {
+    transform: scale(0.98);
+}
+
+.menu-btn.secondary {
+    background: rgba(255, 255, 255, 0.1);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+}
+
+.menu-btn.secondary:hover {
+    background: rgba(255, 255, 255, 0.2);
+}
+
+.menu-btn.small {
+    padding: 8px 16px;
+    font-size: 0.85rem;
+}
+
+/* ==========================================================================
+   3. MAIN GAME INTERFACE (HUD & LAYOUT)
+   ========================================================================== */
+#game-container {
+    display: grid;
+    grid-template-columns: 280px 1fr 300px;
+    width: 100vw;
+    height: 100vh;
+    position: relative;
+}
+
+.side-panel {
+    background: var(--bg-panel);
+    backdrop-filter: var(--glass-blur);
+    border-right: 1px solid var(--border-color);
+    display: flex;
+    flex-direction: column;
+    padding: 20px;
+    z-index: 10;
+}
+
+.right-panel {
+    border-right: none;
+    border-left: 1px solid var(--border-color);
+}
+
+/* Canvas Viewport */
+#canvas-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+    outline: none;
+}
+
+#turn-indicator {
+    position: absolute;
+    top: 20px;
+    left: 50%;
+    transform: translateX(-50%);
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: var(--glass-blur);
+    padding: 8px 24px;
+    border-radius: 20px;
+    font-weight: 600;
+    letter-spacing: 1px;
+    border: 1px solid var(--border-color);
+    pointer-events: none;
+}
+
+.turn-white { border-color: var(--white-player) !important; color: #fff; }
+.turn-black { border-color: var(--black-player) !important; color: var(--accent-primary); }
+
+/* Left Sidebar: Player Profile Cards */
+.player-card {
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.player-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.player-name {
+    font-weight: 600;
+    font-size: 0.95rem;
+}
+
+.chess-clock {
+    background: #000;
+    padding: 4px 10px;
+    border-radius: 6px;
+    font-family: monospace;
+    font-size: 1.2rem;
+    color: var(--text-muted);
+    border: 1px solid transparent;
+}
+
+.chess-clock.active {
+    color: #ff4757;
+    border-color: #ff4757;
+    box-shadow: 0 0 8px rgba(255, 71, 87, 0.3);
+}
+
+.captured-box {
+    min-height: 35px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    font-size: 1.1rem;
+    color: var(--text-muted);
+}
+
+/* In-game quick action controls */
+.control-cluster {
+    margin: auto 0;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.control-cluster button {
+    background: rgba(255, 255, 255, 0.05);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    transition: background 0.2s;
+}
+
+.control-cluster button:hover:not(:disabled) {
+    background: rgba(255, 255, 255, 0.15);
+}
+
+.control-cluster button:disabled {
+    opacity: 0.4;
+    cursor: not-allowed;
+}
+
+/* Right Sidebar: History panel */
+.panel-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 15px;
+}
+
+.icon-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.2rem;
+    cursor: pointer;
+    padding: 5px;
+}
+
+.icon-btn:hover {
+    color: var(--text-main);
+}
+
+.history-log {
+    flex-grow: 1;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 8px;
+    border: 1px solid var(--border-color);
+    overflow-y: auto;
+    padding: 10px;
+}
+
+.history-row {
+    display: grid;
+    grid-template-columns: 40px 1fr 1fr;
+    padding: 6px 8px;
+    font-size: 0.9rem;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.02);
+}
+
+.history-row.header {
+    font-weight: 600;
+    color: var(--text-muted);
+    border-bottom: 1px solid var(--border-color);
+    margin-bottom: 5px;
+}
+
+.history-row:nth-child(even):not(.header) {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.game-footer-actions {
+    margin-top: 15px;
+}
+
+/* ==========================================================================
+   4. MODALS & BOX OVERLAYS
+   ========================================================================== */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: rgba(0, 0, 0, 0.6);
+    backdrop-filter: blur(4px);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+}
+
+.modal-content {
+    background: var(--bg-card);
+    border: 1px solid var(--border-color);
+    border-radius: 12px;
+    padding: 25px;
+    width: 90%;
+    max-width: 400px;
+    box-shadow: 0 15px 30px rgba(0,0,0,0.4);
+}
+
+/* Promotion Layout */
+.promotion-box {
+    text-align: center;
+    max-width: 350px;
+}
+
+.promotion-box h3 {
+    margin-bottom: 20px;
+}
+
+.promotion-options {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+}
+
+.promo-btn {
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    font-size: 2rem;
+    padding: 15px;
+    border-radius: 10px;
+    cursor: pointer;
+    transition: transform 0.2s, background 0.2s;
+    width: 65px;
+    height: 65px;
+}
+
+.promo-btn:hover {
+    background: var(--accent-primary);
+    transform: translateY(-4px);
+}
+
+/* Settings Form items */
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--border-color);
+    padding-bottom: 10px;
+}
+
+.close-btn {
+    background: transparent;
+    border: none;
+    color: var(--text-muted);
+    font-size: 1.7rem;
+    cursor: pointer;
+}
+
+.setting-group {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+}
+
+.setting-group label {
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    color: var(--text-main);
+}
+
+.setting-group select {
+    background: #1e293b;
+    color: white;
+    border: 1px solid var(--border-color);
+    padding: 6px 12px;
+    border-radius: 6px;
+    outline: none;
+}
+
+.setting-group input[type="checkbox"] {
+    width: 18px;
+    height: 18px;
+    cursor: pointer;
+    accent-color: var(--accent-primary);
+}
+
+/* Match Result Final Modal */
+.match-result-box {
+    text-align: center;
+}
+
+#game-over-title {
+    font-size: 2rem;
+    color: #ff4757;
+    margin-bottom: 10px;
+}
+
+#game-over-reason {
+    color: var(--text-muted);
+    margin-bottom: 25px;
+}
+
+.modal-actions {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+/* ==========================================================================
+   5. ANIMATIONS & RESPONSIVE DESIGN
+   ========================================================================== */
+@keyframes spin-and-pulse {
+    0% { transform: rotate(0deg) scale(1); }
+    50% { transform: rotate(180deg) scale(1.1); }
+    100% { transform: rotate(360deg) scale(1); }
+}
+
+/* Responsive UI Overlays for tablets & Mobile devices */
+@media (max-width: 900px) {
+    #game-container {
+        grid-template-columns: 1fr;
+        grid-template-rows: auto 1fr auto;
+    }
+
+    .side-panel {
+        flex-direction: row;
+        justify-content: space-between;
+        align-items: center;
+        padding: 10px 15px;
+        width: 100vw;
+        height: auto;
+        border: none;
+    }
+
+    .left-panel {
+        grid-row: 1;
+        border-bottom: 1px solid var(--border-color);
+    }
+
+    .right-panel {
+        grid-row: 3;
+        border-top: 1px solid var(--border-color);
+        height: 120px; /* Constrain bottom row height */
+    }
+
+    .player-card {
+        flex-direction: row;
+        align-items: center;
+        gap: 15px;
+        padding: 6px 12px;
+    }
+
+    .control-cluster {
+        flex-direction: row;
+        margin: 0;
+    }
+
+    .control-cluster button span {
+        display: none; /* Hide button text to preserve space */
+    }
+
+    .history-log, .panel-header h3 {
+        display: none; /* Strip back historical logs on tight views */
+    }
+    
+    .right-panel {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+}
