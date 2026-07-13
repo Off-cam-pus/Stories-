@@ -3,231 +3,165 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Movie Control Center</title>
-    <style>
-        @import url('https://fonts.googleapis.com/css2?family=SF+Pro+Display:wght@400;500;600;700&display=swap');
-        
-        :root {
-            --bg: #0a0a0f;
-            --glass: rgba(25, 25, 35, 0.75);
-            --accent: #ff2d55;
-            --text: #f5f5f7;
-        }
-        
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        
-        body {
-            font-family: 'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif;
-            background: linear-gradient(135deg, #1a0f23, #0c0b14);
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            overflow: hidden;
-            position: relative;
-            color: var(--text);
-        }
-        
-        body::before {
-            content: '';
-            position: absolute;
-            inset: 0;
-            background: url('https://picsum.photos/id/1015/1200/800') center/cover no-repeat;
-            filter: blur(60px) brightness(0.35) saturate(1.2);
-            z-index: -1;
-            opacity: 0.85;
-        }
-        
-        .control-center {
-            width: 380px;
-            height: 780px;
-            background: var(--bg);
-            border-radius: 52px;
-            overflow: hidden;
-            box-shadow: 0 30px 80px rgba(0, 0, 0, 0.85);
-            border: 14px solid #1a1a22;
-            position: relative;
-        }
-        
-        .status-bar {
-            height: 44px;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-            padding: 0 28px;
-            font-size: 13.5px;
-            font-weight: 600;
-            color: rgba(255,255,255,0.85);
-        }
-        
-        .controls {
-            padding: 18px 20px 30px;
-            height: calc(100% - 44px);
-            overflow-y: auto;
-            display: flex;
-            flex-direction: column;
-            gap: 22px;
-        }
-        
-        .glass {
-            background: var(--glass);
-            backdrop-filter: blur(32px);
-            border-radius: 22px;
-            border: 1px solid rgba(255,255,255,0.1);
-            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
-        }
-        
-        .movie-grid {
-            display: grid;
-            grid-template-columns: repeat(3, 1fr);
-            gap: 14px;
-        }
-        
-        .movie-btn {
-            aspect-ratio: 1/1;
-            background: rgba(255,255,255,0.06);
-            border-radius: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
-            gap: 8px;
-            font-size: 13px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            border: 1px solid rgba(255,255,255,0.08);
-        }
-        
-        .movie-btn:hover {
-            transform: scale(0.94);
-            background: rgba(255, 45, 85, 0.25);
-        }
-        
-        .movie-btn.big {
-            grid-column: span 2;
-            aspect-ratio: 16/9;
-            font-size: 15.5px;
-            background: linear-gradient(135deg, #e50914, #ff2d55);
-        }
-        
-        .icon { font-size: 34px; }
-        .movie-btn.big .icon { font-size: 46px; }
-        
-        .row { display: flex; gap: 14px; }
-        
-        .home-card {
-            flex: 1;
-            padding: 18px;
-            background: var(--glass);
-            border-radius: 22px;
-            display: flex;
-            align-items: center;
-            gap: 18px;
-            cursor: pointer;
-        }
-        
-        .now-playing {
-            padding: 24px 20px;
-            text-align: center;
-            cursor: pointer;
-        }
-        
-        .toast {
-            position: fixed;
-            bottom: 40px;
-            left: 50%;
-            transform: translateX(-50%);
-            background: #ff2d55;
-            color: white;
-            padding: 14px 32px;
-            border-radius: 9999px;
-            font-size: 15.5px;
-            font-weight: 600;
-            display: none;
-            align-items: center;
-            gap: 10px;
-            z-index: 2000;
-            box-shadow: 0 15px 40px rgba(255, 45, 85, 0.5);
-        }
-    </style>
+    <title>3D Chess Odyssey</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 </head>
 <body>
-    <div class="control-center">
-        <div class="status-bar">
-            <div>09:05</div>
-            <div>4G • 88%</div>
+
+    <div id="loading-screen" class="overlay-screen">
+        <div class="loader-content">
+            <i class="fas fa-chess-knight loader-icon"></i>
+            <h2>Loading 3D Assets...</h2>
+            <div class="progress-bar-container">
+                <div id="progress-bar"></div>
+            </div>
+            <p id="loading-status">Initializing WebGL graphics...</p>
         </div>
-        
-        <div class="controls">
-            <div class="glass movie-grid">
-                <div onclick="openZangiChat()" class="movie-btn"><div class="icon">🎥</div><div>Videos</div></div>
-                <div onclick="openZangiChat()" class="movie-btn"><div class="icon">🔗</div><div>Connect</div></div>
-                <div onclick="openZangiChat()" class="movie-btn"><div class="icon">💬</div><div>Chat</div></div>
-                
-                <div onclick="openZangiChat()" class="movie-btn big">
-                    <div class="icon">📺</div>
-                    <div>Prime Video</div>
-                </div>
-                
-                <div onclick="openZangiChat()" class="movie-btn"><div class="icon">📽️</div><div>Series</div></div>
-                <div onclick="openZangiChat()" class="movie-btn"><div class="icon">🎬</div><div>Episode 1</div></div>
-                <div onclick="openZangiChat()" class="movie-btn"><div class="icon">🌍</div><div>Off Campus</div></div>
-                <div onclick="openZangiChat()" class="movie-btn"><div class="icon">📺</div><div>Season 2</div></div>
-            </div>
+    </div>
+
+    <div id="main-menu" class="overlay-screen hidden">
+        <div class="menu-card">
+            <h1>3D CHESS</h1>
+            <p class="subtitle">Experience the Classic Game in Three Dimensions</p>
             
-            <div class="row">
-                <div onclick="openZangiChat()" class="home-card">
-                    <div style="font-size:46px;">🍿</div>
-                    <div>
-                        <div style="font-weight:700;">Latest Movies</div>
-                        <div style="font-size:13px; opacity:0.75;">Now Playing</div>
-                    </div>
-                </div>
-                <div onclick="openZangiChat()" class="home-card">
-                    <div style="font-size:46px;">❤️</div>
-                    <div>
-                        <div style="font-weight:700;">Favorites</div>
-                        <div style="font-size:13px; opacity:0.75;">Belmont Picks</div>
-                    </div>
-                </div>
-            </div>
-            
-            <div onclick="openZangiChat()" class="glass now-playing">
-                <div style="opacity:0.75; font-size:14.5px;">Now Playing • Season 2 Episode 1</div>
-                <div style="font-size:42px; margin:12px 0;">▶️</div>
-                <div style="font-weight:700; font-size:17px;">Movie Soundtrack</div>
+            <div class="menu-options">
+                <button id="btn-pvp" class="menu-btn"><i class="fas fa-users"></i> Local Pass & Play</button>
+                <button id="btn-ai" class="menu-btn"><i class="fas fa-robot"></i> Play Against AI</button>
+                <button id="btn-open-settings" class="menu-btn secondary"><i class="fas fa-cog"></i> Settings</button>
             </div>
         </div>
     </div>
-    
-    <div id="toast" class="toast">
-        💬 Opening Zangi chat with 2884814537...
-    </div>
-    
-    <script>
-        function openZangiChat() {
-            const phone = "2884814537";   
-            const message = encodeURIComponent("Hello Belmont, I love your Movies!");
-            
-            const toast = document.getElementById('toast');
-            toast.style.display = 'flex';
-            
-            // Zangi deep link format to open chat directly with prefilled text
-            window.location.href = `https://zangi.com/dl/chat?phone=${phone}&text=${message}`;
-            
-            // Hide toast after 3 seconds
-            setTimeout(() => {
-                toast.style.display = 'none';
-            }, 3000);
-        }
+
+    <main id="game-container" class="hidden">
         
-        // Click outside also triggers the action
-        document.body.addEventListener('click', (e) => {
-            if (!e.target.closest('.control-center')) {
-                openZangiChat();
-            }
-        });
-    </script>
+        <section class="side-panel left-panel">
+            <div class="player-card" id="player2-card">
+                <div class="player-info">
+                    <span class="player-name"><i class="fas fa-robot"></i> AI (Black)</span>
+                    <div class="chess-clock" id="clock-black">10:00</div>
+                </div>
+                <div class="captured-box" id="captured-by-black">
+                    </div>
+            </div>
+
+            <div class="control-cluster">
+                <button id="btn-rotate-camera" title="Rotate Camera"><i class="fas fa-sync-alt"></i> Flip View</button>
+                <button id="btn-reset-camera" title="Reset View"><i class="fas fa-camera"></i> Reset Cam</button>
+                <button id="btn-undo" title="Undo Move" disabled><i class="fas fa-undo"></i> Undo</button>
+                <button id="btn-resign" title="Resign Match"><i class="fas fa-flag"></i> Resign</button>
+            </div>
+
+            <div class="player-card" id="player1-card">
+                <div class="captured-box" id="captured-by-white">
+                    </div>
+                <div class="player-info">
+                    <span class="player-name"><i class="fas fa-user"></i> Player (White)</span>
+                    <div class="chess-clock active" id="clock-white">10:00</div>
+                </div>
+            </div>
+        </section>
+
+        <section id="canvas-container">
+            <div id="turn-indicator" class="turn-white">White's Turn</div>
+        </section>
+
+        <section class="side-panel right-panel">
+            <div class="panel-header">
+                <h3><i class="fas fa-history"></i> Move Log</h3>
+                <button id="btn-menu-settings" class="icon-btn" title="Settings"><i class="fas fa-sliders-h"></i></button>
+            </div>
+            
+            <div id="move-history" class="history-log">
+                <div class="history-row header">
+                    <span>#</span><span>White</span><span>Black</span>
+                </div>
+                </div>
+
+            <div class="game-footer-actions">
+                <button id="btn-home" class="menu-btn secondary small"><i class="fas fa-home"></i> Main Menu</button>
+            </div>
+        </section>
+
+    </main>
+
+    <div id="promotion-modal" class="modal-overlay hidden">
+        <div class="modal-content promotion-box">
+            <h3>Promote Your Pawn</h3>
+            <div class="promotion-options">
+                <button class="promo-btn" data-piece="queen" title="Queen"><i class="fas fa-chess-queen"></i></button>
+                <button class="promo-btn" data-piece="rook" title="Rook"><i class="fas fa-chess-rook"></i></button>
+                <button class="promo-btn" data-piece="bishop" title="Bishop"><i class="fas fa-chess-bishop"></i></button>
+                <button class="promo-btn" data-piece="knight" title="Knight"><i class="fas fa-chess-knight"></i></button>
+            </div>
+        </div>
+    </div>
+
+    <div id="settings-modal" class="modal-overlay hidden">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2>Game Settings</h2>
+                <button id="btn-close-settings" class="close-btn">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="setting-group">
+                    <label><i class="fas fa-volume-up"></i> Sound Effects</label>
+                    <input type="checkbox" id="setting-sound" checked>
+                </div>
+                
+                <div class="setting-group">
+                    <label for="setting-theme"><i class="fas fa-palette"></i> Board Style</label>
+                    <select id="setting-theme">
+                        <option value="classic">Classic Wood</option>
+                        <option value="marble">Modern Marble</option>
+                        <option value="neon">Cyber Neon</option>
+                    </select>
+                </div>
+
+                <div class="setting-group">
+                    <label for="setting-difficulty"><i class="fas fa-brain"></i> AI Difficulty</label>
+                    <select id="setting-difficulty">
+                        <option value="easy">Easy (Casual)</option>
+                        <option value="medium" selected>Medium (Challenging)</option>
+                        <option value="hard">Hard (Grandmaster)</option>
+                    </select>
+                </div>
+
+                <div class="setting-group">
+                    <label for="setting-time"><i class="fas fa-hourglass-half"></i> Time Control</label>
+                    <select id="setting-time">
+                        <option value="3">3 Minutes (Blitz)</option>
+                        <option value="10" selected>10 Minutes (Rapid)</option>
+                        <option value="30">30 Minutes (Classical)</option>
+                    </select>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div id="game-over-modal" class="modal-overlay hidden">
+        <div class="modal-content match-result-box">
+            <h2 id="game-over-title">Checkmate!</h2>
+            <p id="game-over-reason">White wins by technical knockout.</p>
+            <div class="modal-actions">
+                <button id="btn-rematch" class="menu-btn"><i class="fas fa-redo"></i> Rematch</button>
+                <button id="btn-quit" class="menu-btn secondary"><i class="fas fa-sign-out-alt"></i> Quit to Menu</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/three@0.128.0/examples/js/controls/OrbitControls.js"></script>
+
+    <script src="utils.js"></script>
+    <script src="sound.js"></script>
+    <script src="ui.js"></script>
+    <script src="pieces.js"></script>
+    <script src="board.js"></script>
+    <script src="controls.js"></script>
+    <script src="animation.js"></script>
+    <script src="ai.js"></script>
+    <script src="game.js"></script>
+    <script src="script.js"></script>
 </body>
 </html>
